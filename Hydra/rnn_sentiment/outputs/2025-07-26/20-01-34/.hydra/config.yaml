@@ -1,0 +1,19 @@
+model:
+  model:
+    input_dim: 5
+    hidden_size: 3
+    num_layers: 2
+    output_dim: 1
+    activation: sigmoid
+train:
+  train:
+    learning_rate: 0.01
+    batch_size: 2
+    epochs: 10
+    seed: 42
+data:
+  data:
+    path: data/sentiment.csv
+    max_seq_len: 5
+    batch_size: 32
+experiment_name: rnn_sentiment

@@ -1,0 +1,5 @@
+model:
+  hidden_size: 10 # Size of the hidden layer (increased for better capacity)
+  num_layers: 2 # Number of RNN layers
+  output_dim: 1 # Output dimension for binary sentiment classification
+  activation: sigmoid # Activation function for the output layer

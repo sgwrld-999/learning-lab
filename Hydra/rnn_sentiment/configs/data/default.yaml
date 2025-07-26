@@ -1,0 +1,4 @@
+data:
+  path: data/sentiment.csv
+  max_seq_len: 5
+  batch_size: 32
