@@ -1,0 +1,31 @@
+# @package hydra.launcher
+_target_: hydra_plugins.hydra_ray_launcher.RayLauncher
+
+# Ray configuration
+ray:
+  # Ray cluster configuration
+  address: null  # Use local cluster, or specify remote cluster address
+  num_cpus: null # Use all available CPUs
+  num_gpus: 0    # Number of GPUs to use
+  
+  # Ray runtime environment
+  runtime_env:
+    pip: ["ray[tune]", "tensorflow", "hydra-core"]
+  
+  # Stop criteria for Ray Tune
+  stop:
+    training_iteration: 100
+    time_total_s: 600  # 10 minutes max per trial
+  
+  # Tune configuration
+  tune:
+    num_samples: 10
+    resources_per_trial:
+      cpu: 2
+      gpu: 0
+    
+    # Scheduler for early stopping
+    scheduler:
+      _target_: ray.tune.schedulers.AsyncHyperBandScheduler
+      max_t: 100
+      grace_period: 10

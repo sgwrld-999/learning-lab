@@ -1,0 +1,4 @@
+tensorflow
+ray[train,tune]
+hydra-core
+hydra-ray-launcher

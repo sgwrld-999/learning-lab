@@ -1,0 +1,12 @@
+# @package _global_
+# Ray Tune hyperparameter optimization configuration
+
+tune:
+  # Number of trials to run
+  num_samples: 10
+  
+  # Resources per trial
+  cpu_per_trial: 2
+  resources_per_trial:
+    cpu: 2
+    gpu: 0

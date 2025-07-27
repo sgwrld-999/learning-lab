@@ -1,0 +1,15 @@
+# @package _global_
+# Model architecture configuration for LSTM
+
+input_length: 28  # For MNIST: treat 28x28 images as sequences of length 28
+input_dim: 28     # Each sequence element has 28 features (one row of pixels)
+hidden_units: 128 # Number of LSTM units in each layer
+num_layers: 2     # Number of LSTM layers
+output_dim: 10    # Number of output classes for MNIST (digits 0-9)
+
+# Model compilation parameters
+optimizer: 'adam'
+loss: 'categorical_crossentropy'
+
+# Model saving path
+model_save_path: './models/lstm_model.h5'
