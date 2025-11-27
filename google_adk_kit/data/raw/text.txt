@@ -1,0 +1,24 @@
+  {
+    "url": "https://www.shl.com/products/product-catalog/?start=13&type=1&type=1",
+    "title": "Find assessments that best meet your needs.",
+    "description": "Browse through our product assessment catalog for unrivalled employee assessments that evaluate cognitive ability, personality, behavior, skills, and more.",
+    "category": "",
+    "key_features": [],
+    "target_audience": "",
+    "assessment_type": "",
+    "duration": "",
+    "full_text": "Search by keyword...\nSearch by choosing one or more...\nSearch by job by title...\n| Individual Test Solutions | Remote Testing | Adaptive/IRT | Test Type |\n|---|---|---|---|\n| Adobe Photoshop CC | K | ||\n| Aeronautical Engineering (New) | K | ||\n| Aerospace Engineering (New) | K | ||\n| Agile Software Development | K | ||\n| Agile Testing (New) | K | ||\n| AI Skills | P | ||\n| Amazon Web Services (AWS) Development (New) | K | ||\n| Android Development (New) | K | ||\n| Angular 6 (New) | K | ||\n| AngularJS (New) | K | ||\n| Apache Hadoop (New) | K | ||\n| Apache Hadoop Extensions (New) | K |\n- A Ability & Aptitude\n- B Biodata & Situational Judgement\n- C Competencies\n- D Development & 360\n- E Assessment Exercises\n- K Knowledge & Skills\n- P Personality & Behavior\n- S Simulations\nExplore SHL’s Wide Range of Assessment Solutions\nLooking to discover more about SHL’s broader solution offerings, rather than browsing this assessments catalog?"
+  }
+
+
+   {
+    "url": "https://www.shl.com/products/product-catalog/view/net-framework-4-5/",
+    "title": ".NET Framework 4.5",
+    "description": ".NET Framework 4.5: The.NET Framework 4.5 test measures knowledge of .NET environment. Designed for experienced users, this test covers the following topics: Application…",
+    "category": "",
+    "key_features": [],
+    "target_audience": "",
+    "assessment_type": "",
+    "duration": "",
+    "full_text": ".NET Framework 4.5\nDescription\nThe.NET Framework 4.5 test measures knowledge of .NET environment. Designed for experienced users, this test covers the following topics: Application Development, Application Foundation, Data Modeling, Deployment, Diagnostics, Performance, Portability, and Security.\nJob levels\nProfessional Individual Contributor, Mid-Professional,\nLanguages\nEnglish (USA),\nAssessment length\nApproximate Completion Time in minutes = 30\nTest Type: K\nRemote Testing:\nDownloads\nAccelerate Your Talent Strategy\nSpeak to our team today to see how our products transform talent strategy.\n- A Ability & Aptitude\n- B Biodata & Situational Judgement\n- C Competencies\n- D Development & 360\n- E Assessment Exercises\n- K Knowledge & Skills\n- P Personality & Behavior\n- S Simulations"
+  }

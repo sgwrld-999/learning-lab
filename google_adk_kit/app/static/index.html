@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Recommender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .examples {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .examples h3 {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .example-chip {
+            padding: 8px 15px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .example-chip:hover {
+            background: #e0e0e0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 1.2rem;
+            display: none;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .assessment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .assessment-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .assessment-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .assessment-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .meta-badge {
+            padding: 5px 12px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .meta-badge.duration {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .meta-badge.remote {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .meta-badge.adaptive {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .test-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .test-type-badge {
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .assessment-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .assessment-link:hover {
+            transform: translateX(5px);
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 40px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 SHL Assessment Recommender</h1>
+            <p>AI-Powered Assessment Discovery System</p>
+        </div>
+
+        <div class="search-box">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="Describe your requirements (e.g., 'Data Science roles', 'Leadership assessment', 'Python developer')"
+            />
+            <button class="search-button" onclick="searchAssessments()">
+                Search Assessments
+            </button>
+
+            <div class="examples">
+                <h3>Example Queries:</h3>
+                <div class="example-chips">
+                    <span class="example-chip" onclick="setQuery('Data Science assessments')">Data Science assessments</span>
+                    <span class="example-chip" onclick="setQuery('Leadership and management')">Leadership and management</span>
+                    <span class="example-chip" onclick="setQuery('Python programming test')">Python programming test</span>
+                    <span class="example-chip" onclick="setQuery('Customer service roles')">Customer service roles</span>
+                    <span class="example-chip" onclick="setQuery('Project manager competencies')">Project manager competencies</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <p>🔍 Searching through 348+ assessments...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="no-results" id="noResults">No assessments found. Try a different query.</div>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = '';  // Same origin
+
+        function setQuery(query) {
+            document.getElementById('searchInput').value = query;
+            searchAssessments();
+        }
+
+        async function searchAssessments() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Please enter a search query');
+                return;
+            }
+
+            // Show loading, hide others
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+            document.getElementById('results').innerHTML = '';
+
+            try {
+                const response = await fetch(`${API_BASE}/recommend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data.recommended_assessments);
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error').textContent = `Error: ${error.message}`;
+                document.getElementById('error').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayResults(assessments) {
+            const resultsContainer = document.getElementById('results');
+
+            if (!assessments || assessments.length === 0) {
+                document.getElementById('noResults').style.display = 'block';
+                return;
+            }
+
+            assessments.forEach(assessment => {
+                const card = createAssessmentCard(assessment);
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        function createAssessmentCard(assessment) {
+            const card = document.createElement('div');
+            card.className = 'assessment-card';
+
+            const title = document.createElement('h3');
+            title.className = 'assessment-title';
+            title.textContent = assessment.name;
+
+            const description = document.createElement('p');
+            description.className = 'assessment-description';
+            description.textContent = assessment.description || 'No description available';
+
+            const meta = document.createElement('div');
+            meta.className = 'assessment-meta';
+
+            if (assessment.duration) {
+                const durationBadge = document.createElement('span');
+                durationBadge.className = 'meta-badge duration';
+                durationBadge.textContent = `⏱️ ${assessment.duration} min`;
+                meta.appendChild(durationBadge);
+            }
+
+            if (assessment.remote_support && assessment.remote_support !== 'No') {
+                const remoteBadge = document.createElement('span');
+                remoteBadge.className = 'meta-badge remote';
+                remoteBadge.textContent = '🌐 Remote';
+                meta.appendChild(remoteBadge);
+            }
+
+            if (assessment.adaptive_support && assessment.adaptive_support !== 'No') {
+                const adaptiveBadge = document.createElement('span');
+                adaptiveBadge.className = 'meta-badge adaptive';
+                adaptiveBadge.textContent = '🎯 Adaptive';
+                meta.appendChild(adaptiveBadge);
+            }
+
+            const testTypes = document.createElement('div');
+            testTypes.className = 'test-types';
+            if (assessment.test_type && Array.isArray(assessment.test_type)) {
+                assessment.test_type.forEach(type => {
+                    const badge = document.createElement('span');
+                    badge.className = 'test-type-badge';
+                    badge.textContent = type;
+                    testTypes.appendChild(badge);
+                });
+            }
+
+            const link = document.createElement('a');
+            link.className = 'assessment-link';
+            link.href = assessment.url;
+            link.target = '_blank';
+            link.textContent = 'View Assessment →';
+
+            card.appendChild(title);
+            card.appendChild(description);
+            card.appendChild(meta);
+            card.appendChild(testTypes);
+            card.appendChild(link);
+
+            return card;
+        }
+
+        // Allow Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchAssessments();
+            }
+        });
+    </script>
+</body>
+</html>

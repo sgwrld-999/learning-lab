@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .chat-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            display: flex;
+            gap: 15px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.user .message-avatar {
+            background: #e9ecef;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.6;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .assessment-results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .assessment-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .assessment-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .assessment-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .assessment-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .assessment-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .meta-badge {
+            padding: 4px 10px;
+            background: #e9ecef;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #495057;
+        }
+
+        .meta-badge.duration { background: #e3f2fd; color: #1976d2; }
+        .meta-badge.remote { background: #e8f5e9; color: #388e3c; }
+        .meta-badge.adaptive { background: #fff3e0; color: #f57c00; }
+
+        .test-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .test-type-badge {
+            padding: 3px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .assessment-link {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .assessment-link:hover {
+            background: #764ba2;
+        }
+
+        .chat-input-area {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .quick-action {
+            padding: 8px 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .quick-action:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .message-content {
+                max-width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div>
+                <h1>🎯 SHL Assessment Assistant</h1>
+                <p>AI-powered assessment recommendations</p>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h2>👋 Welcome to SHL Assessment Chatbot!</h2>
+                <p>Ask me anything about assessment recommendations for your hiring needs.</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;">Try the quick actions below or type your own query.</p>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="quick-actions">
+                <button class="quick-action" onclick="sendQuickQuery('I am hiring for Java developers who can also collaborate effectively with my business teams.')">Java developer with collaboration skills</button>
+                <button class="quick-action" onclick="sendQuickQuery('Looking to hire mid-level professionals who are proficient in Python, SQL and JavaScript.')">Python, SQL, JavaScript roles</button>
+                <button class="quick-action" onclick="sendQuickQuery('Need assessment for analyst role using Cognitive and personality tests.')">Analyst with cognitive tests</button>
+                <button class="quick-action" onclick="sendQuickQuery('Leadership and management assessments')">Leadership assessments</button>
+            </div>
+
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Describe your hiring needs..."
+                    onkeypress="handleKeyPress(event)"
+                />
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let isProcessing = false;
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isProcessing) {
+                sendMessage();
+            }
+        }
+
+        function sendQuickQuery(query) {
+            document.getElementById('chatInput').value = query;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const query = input.value.trim();
+
+            if (!query || isProcessing) return;
+
+            isProcessing = true;
+            input.value = '';
+            document.getElementById('sendButton').disabled = true;
+
+            // Add user message
+            addMessage(query, 'user');
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_BASE}/recommend`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                removeTypingIndicator(typingId);
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                addAssessmentResults(data.recommended_assessments, query);
+
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage(`Sorry, I encountered an error: ${error.message}. Please try again.`, 'bot');
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendButton').disabled = false;
+                input.focus();
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? '👤' : '🤖';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            messagesContainer.appendChild(messageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return messageDiv;
+        }
+
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            messageDiv.id = 'typing-' + Date.now();
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator show';
+            typingDiv.innerHTML = `
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(typingDiv);
+            messagesContainer.appendChild(messageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return messageDiv.id;
+        }
+
+        function removeTypingIndicator(id) {
+            const typingElement = document.getElementById(id);
+            if (typingElement) {
+                typingElement.remove();
+            }
+        }
+
+        function addAssessmentResults(assessments, query) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+
+            if (!assessments || assessments.length === 0) {
+                content.textContent = 'I couldn\'t find any relevant assessments for your query. Please try rephrasing your request.';
+            } else {
+                const intro = document.createElement('p');
+                intro.textContent = `I found ${assessments.length} relevant assessment${assessments.length > 1 ? 's' : ''} for your needs:`;
+                intro.style.marginBottom = '15px';
+                content.appendChild(intro);
+
+                const resultsDiv = document.createElement('div');
+                resultsDiv.className = 'assessment-results';
+
+                assessments.forEach(assessment => {
+                    const card = createAssessmentCard(assessment);
+                    resultsDiv.appendChild(card);
+                });
+
+                content.appendChild(resultsDiv);
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            messagesContainer.appendChild(messageDiv);
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function createAssessmentCard(assessment) {
+            const card = document.createElement('div');
+            card.className = 'assessment-card';
+
+            const title = document.createElement('div');
+            title.className = 'assessment-title';
+            title.textContent = assessment.name;
+            card.appendChild(title);
+
+            const description = document.createElement('div');
+            description.className = 'assessment-description';
+            description.textContent = assessment.description || 'No description available';
+            card.appendChild(description);
+
+            const meta = document.createElement('div');
+            meta.className = 'assessment-meta';
+
+            if (assessment.duration) {
+                const durationBadge = document.createElement('span');
+                durationBadge.className = 'meta-badge duration';
+                durationBadge.textContent = `⏱️ ${assessment.duration}`;
+                meta.appendChild(durationBadge);
+            }
+
+            if (assessment.remote_support && assessment.remote_support !== 'No') {
+                const remoteBadge = document.createElement('span');
+                remoteBadge.className = 'meta-badge remote';
+                remoteBadge.textContent = '🌐 Remote';
+                meta.appendChild(remoteBadge);
+            }
+
+            if (assessment.adaptive_support && assessment.adaptive_support !== 'No') {
+                const adaptiveBadge = document.createElement('span');
+                adaptiveBadge.className = 'meta-badge adaptive';
+                adaptiveBadge.textContent = '🎯 Adaptive';
+                meta.appendChild(adaptiveBadge);
+            }
+
+            card.appendChild(meta);
+
+            if (assessment.test_type && Array.isArray(assessment.test_type) && assessment.test_type.length > 0) {
+                const testTypes = document.createElement('div');
+                testTypes.className = 'test-types';
+                assessment.test_type.forEach(type => {
+                    const badge = document.createElement('span');
+                    badge.className = 'test-type-badge';
+                    badge.textContent = type;
+                    testTypes.appendChild(badge);
+                });
+                card.appendChild(testTypes);
+            }
+
+            const link = document.createElement('a');
+            link.className = 'assessment-link';
+            link.href = assessment.url;
+            link.target = '_blank';
+            link.textContent = 'View Assessment →';
+            card.appendChild(link);
+
+            return card;
+        }
+
+        // Focus input on load
+        window.onload = () => {
+            document.getElementById('chatInput').focus();
+        };
+    </script>
+</body>
+</html>

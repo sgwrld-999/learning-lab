@@ -1,0 +1,21 @@
+Hi,
+
+Thank you for your interest in the Research Intern position at SHL. As the next step in our recruitment process, we'd like you to complete an assessment. You can choose one of the following options to demonstrate your skills:
+
+1. GenAl Assessment Recommendation: Building a web-based RAG tool using our product catalog
+2. Build a Grammar Scoring Engine from Voice Samples (hosted on Kaggle)
+
+To indicate your preference and get more details about above options, please fill this Assessment Selection Form
+
+Deadline: 10th Nov, 11:00 AM. Late submissions are accepted; however, we will begin reviewing applications as they are received and will continue until all positions are filled.
+
+How to submit: Please submit your work using this Assessment Submission Form.  Valid submissions will receive feedback.
+
+Please ensure that all links you provide (such as GitHub repositories, API URLs, and tool links) remain accessible and functional, as we will be running automated tests. We typically receive a large number of submissions, so any inaccessible links may prevent you from completing this round.
+
+If you have any questions or need clarification, please reach out to Tania Goyal at tania.goyal@shl.com
+
+Thanks for your time. We look forward to seeing your solution as well as hope to work together.
+
+Regards
+SHL AI Team

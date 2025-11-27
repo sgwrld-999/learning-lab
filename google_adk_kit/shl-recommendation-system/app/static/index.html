@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHL Assessment Recommender - AI Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .chat-container {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.bot .message-avatar {
+            background: #34495e;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .assessments-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .assessment-card-mini {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .assessment-card-mini:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .assessment-card-mini h4 {
+            color: #333;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .assessment-card-mini p {
+            color: #666;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .assessment-meta-mini {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .meta-badge-mini {
+            padding: 4px 10px;
+            background: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 18px;
+            font-size: 0.95rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .example-queries {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .example-query {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .example-query:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .welcome-message h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-container">
+            <div class="header">
+                <h1>🤖 SHL Assessment Advisor</h1>
+                <p>AI-Powered Chatbot for Assessment Recommendations</p>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h2>👋 Welcome!</h2>
+                    <p>I'm your AI assessment advisor. Ask me about assessments for any role, skill, or job description.</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">Try: "I need Java developer assessments" or click examples →</p>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="Ask about assessments..."
+                        onkeypress="handleKeyPress(event)"
+                    />
+                    <button class="send-button" id="sendButton" onclick="sendMessage()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3>💡 Example Queries</h3>
+            <div class="example-queries">
+                <div class="example-query" onclick="useExample('I am hiring for Java developers who can also collaborate effectively with my business teams.')">
+                    Java developer with collaboration skills
+                </div>
+                <div class="example-query" onclick="useExample('Looking to hire mid-level professionals who are proficient in Python, SQL and JavaScript.')">
+                    Mid-level Python, SQL, JavaScript
+                </div>
+                <div class="example-query" onclick="useExample('I need assessments for Data Science roles')">
+                    Data Science assessments
+                </div>
+                <div class="example-query" onclick="useExample('Leadership and management assessments')">
+                    Leadership & management
+                </div>
+                <div class="example-query" onclick="useExample('I am hiring for an analyst and wants to screen using Cognitive and personality tests.')">
+                    Analyst - Cognitive & Personality
+                </div>
+                <div class="example-query" onclick="useExample('Customer service roles assessment')">
+                    Customer service roles
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let isProcessing = false;
+
+        function useExample(query) {
+            document.getElementById('chatInput').value = query;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const query = input.value.trim();
+            
+            if (!query || isProcessing) return;
+
+            isProcessing = true;
+            document.getElementById('sendButton').disabled = true;
+
+            // Clear welcome message
+            const welcome = document.querySelector('.welcome-message');
+            if (welcome) welcome.remove();
+
+            // Add user message
+            addMessage('user', query);
+            input.value = '';
+
+            // Show typing indicator
+            const typingId = addTypingIndicator();
+
+            try {
+                const response = await fetch(`${API_BASE}/recommend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                removeTypingIndicator(typingId);
+
+                if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+                const data = await response.json();
+                
+                if (data.recommended_assessments && data.recommended_assessments.length > 0) {
+                    addBotMessageWithAssessments(query, data.recommended_assessments);
+                } else {
+                    addMessage('bot', 'I couldn\'t find any assessments matching your query. Try rephrasing or being more specific.');
+                }
+
+            } catch (error) {
+                removeTypingIndicator(typingId);
+                addMessage('bot', `Sorry, I encountered an error: ${error.message}`);
+            } finally {
+                isProcessing = false;
+                document.getElementById('sendButton').disabled = false;
+            }
+        }
+
+        function addMessage(type, content) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = type === 'user' ? '👤' : '🤖';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addBotMessageWithAssessments(query, assessments) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const intro = document.createElement('p');
+            intro.textContent = `I found ${assessments.length} relevant assessment${assessments.length > 1 ? 's' : ''} for your query:`;
+            intro.style.marginBottom = '10px';
+            intro.style.fontWeight = '600';
+            contentDiv.appendChild(intro);
+
+            const grid = document.createElement('div');
+            grid.className = 'assessments-grid';
+
+            assessments.forEach(assessment => {
+                const card = createAssessmentCardMini(assessment);
+                grid.appendChild(card);
+            });
+
+            contentDiv.appendChild(grid);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function createAssessmentCardMini(assessment) {
+            const card = document.createElement('div');
+            card.className = 'assessment-card-mini';
+            card.onclick = () => window.open(assessment.url, '_blank');
+
+            const title = document.createElement('h4');
+            title.textContent = assessment.name;
+
+            const description = document.createElement('p');
+            const desc = assessment.description || 'No description available';
+            description.textContent = desc.length > 120 ? desc.substring(0, 120) + '...' : desc;
+
+            const meta = document.createElement('div');
+            meta.className = 'assessment-meta-mini';
+
+            if (assessment.duration) {
+                const badge = document.createElement('span');
+                badge.className = 'meta-badge-mini';
+                badge.textContent = `⏱️ ${assessment.duration}`;
+                badge.style.background = '#e3f2fd';
+                badge.style.color = '#1976d2';
+                meta.appendChild(badge);
+            }
+
+            if (assessment.remote_support && assessment.remote_support !== 'No') {
+                const badge = document.createElement('span');
+                badge.className = 'meta-badge-mini';
+                badge.textContent = '🌐 Remote';
+                badge.style.background = '#e8f5e9';
+                badge.style.color = '#388e3c';
+                meta.appendChild(badge);
+            }
+
+            if (assessment.test_type && Array.isArray(assessment.test_type)) {
+                assessment.test_type.forEach(type => {
+                    const badge = document.createElement('span');
+                    badge.className = 'meta-badge-mini';
+                    badge.textContent = type;
+                    badge.style.background = '#ede7f6';
+                    badge.style.color = '#5e35b1';
+                    meta.appendChild(badge);
+                });
+            }
+
+            card.appendChild(title);
+            card.appendChild(description);
+            card.appendChild(meta);
+
+            return card;
+        }
+
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            const id = 'typing-' + Date.now();
+            messageDiv.id = id;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = '🤖';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const typing = document.createElement('div');
+            typing.className = 'typing-indicator';
+            typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+            
+            contentDiv.appendChild(typing);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            return id;
+        }
+
+        function removeTypingIndicator(id) {
+            const element = document.getElementById(id);
+            if (element) element.remove();
+        }
+    </script>
+</body>
+</html>
