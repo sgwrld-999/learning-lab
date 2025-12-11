@@ -143,3 +143,6 @@ cython_debug/
 
 # macOS
 .DS_Store
+
+# folder
+google_adk_kit/chatbot-in-langgraph/*
