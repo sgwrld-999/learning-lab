@@ -145,4 +145,4 @@ cython_debug/
 .DS_Store
 
 # folder
-google_adk_kit/chatbot-in-langgraph/*
+google_adk_kit/chatbot-in-langgraph/*google_adk_kit/chatbot-in-langgraph/
